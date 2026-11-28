@@ -1,0 +1,218 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="id" xml:lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Riwayat Pesanan | Sweet Crumbs Bakery</title>
+
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+
+    <style>
+        .history-container {
+            max-width: 850px;
+            margin: 50px auto;
+        }
+
+        .history-card {
+            background: white;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed var(--line);
+        }
+
+        .history-header h3 {
+            margin: 0;
+        }
+
+        .history-date {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        .history-status {
+            display: inline-block;
+            padding: 7px 12px;
+            border-radius: 20px;
+            background: var(--cream);
+            color: var(--brown);
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .history-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 18px;
+            padding-top: 15px;
+            border-top: 1px solid var(--line);
+            font-weight: bold;
+        }
+
+        .history-total strong {
+            color: var(--accent);
+        }
+
+        .history-button {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 18px;
+            border-radius: 8px;
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .history-empty {
+            background: white;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 45px 20px;
+            text-align: center;
+        }
+
+        .history-empty p {
+            color: var(--muted);
+        }
+
+        @media (max-width: 600px) {
+            .history-container {
+                margin: 30px 15px;
+            }
+
+            .history-card {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="navbar">
+        <div class="container nav-content">
+            <a class="brand" href="index.php">Sweet Crumbs<span>.</span></a>
+
+            <div class="nav-links">
+                <a href="index.php">Beranda</a>
+                <a href="katalog.php">Katalog</a>
+                <a href="pemesanan.php">Keranjang</a>
+                <a href="riwayat_pesanan.php" class="active">Riwayat</a>
+                <a href="profil.php">Profil</a>
+                <a href="logout.php" class="nav-button"
+                   onclick="return confirm('Yakin ingin logout?')">
+                    Logout
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <main class="container history-container">
+
+        <div class="admin-heading">
+            <div>
+                <p class="eyebrow">SWEET CRUMBS BAKERY</p>
+                <h1>Riwayat Pesanan</h1>
+                <p class="admin-welcome">
+                    Lihat semua pesanan dan pantau perkembangan pesananmu.
+                </p>
+            </div>
+        </div>
+
+        <?php if (empty($pesanan)): ?>
+
+            <div class="history-empty">
+                <div style="font-size: 45px;">🥐</div>
+
+                <h3>Belum Ada Pesanan</h3>
+
+                <p>
+                    Kamu belum memiliki riwayat pesanan.
+                    Yuk, pilih menu favoritmu!
+                </p>
+
+                <a href="pemesanan.php" class="history-button">
+                    Mulai Pesan
+                </a>
+            </div>
+
+        <?php else: ?>
+
+            <?php foreach ($pesanan as $item): ?>
+
+                <div class="history-card">
+
+                    <div class="history-header">
+                        <div>
+                            <h3>
+                                #BKY-<?= str_pad(
+                                    $item['id'],
+                                    4,
+                                    '0',
+                                    STR_PAD_LEFT
+                                ) ?>
+                            </h3>
+
+                            <p class="history-date">
+                                <?= date(
+                                    'd-m-Y H:i',
+                                    strtotime($item['created_at'])
+                                ) ?>
+                            </p>
+                        </div>
+
+                        <span class="history-status">
+                            <?= htmlspecialchars($item['status']) ?>
+                        </span>
+                    </div>
+
+                    <div class="history-total">
+                        <span>Total Pesanan</span>
+
+                        <strong>
+                            Rp <?= number_format(
+                                $item['total_harga'],
+                                0,
+                                ',',
+                                '.'
+                            ) ?>
+                        </strong>
+                    </div>
+
+                    <a
+                        href="status_pesanan.php?id=<?= (int)$item['id'] ?>"
+                        class="history-button"
+                    >
+                        Lihat Detail Pesanan
+                    </a>
+
+                </div>
+
+            <?php endforeach; ?>
+
+        <?php endif; ?>
+
+    </main>
+
+    <div class="footer">
+        <p>Sweet Crumbs Bakery &#169; 2026</p>
+    </div>
+
+</body>
+</html>

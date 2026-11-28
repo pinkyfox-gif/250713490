@@ -1,0 +1,136 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="id" xml:lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pemesanan Produk | Sweet Crumbs Bakery</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+</head>
+<body>
+    
+<div class="navbar">
+    <div class="container nav-content">
+        <a class="brand" href="index.php">Sweet Crumbs<span>.</span></a>
+
+        <div class="nav-links">
+            <a href="index.php"
+               class="<?= (basename($_SERVER['PHP_SELF']) == 'index.php') ? 'active' : '' ?>">
+                Beranda
+            </a>
+
+            <a href="katalog.php"
+               class="<?= (basename($_SERVER['PHP_SELF']) == 'katalog.php') ? 'active' : '' ?>">
+                Katalog
+            </a>
+
+            <a href="pemesanan.php"
+               class="<?= (basename($_SERVER['PHP_SELF']) == 'pemesanan.php') ? 'active' : '' ?>">
+                Keranjang
+            </a>
+
+            <a href="riwayat_pesanan.php"
+               class="<?= (basename($_SERVER['PHP_SELF']) == 'riwayat_pesanan.php') ? 'active' : '' ?>">
+                Riwayat
+            </a>
+
+            <a href="profil.php"
+               class="<?= (basename($_SERVER['PHP_SELF']) == 'profil.php') ? 'active' : '' ?>">
+                Profil
+            </a>
+
+            <a href="logout.php"
+               class="nav-button"
+               onclick="return confirm('Yakin ingin logout?')">
+                Logout
+            </a>
+        </div>
+    </div>
+</div>
+
+
+    <div class="container order-container">
+        <div class="order-products">
+            <h2>Pilih Menu Favoritmu</h2>
+            <div class="order-grid">
+                <?php foreach ($produk as $item) : ?>
+                    <div class="order-card">
+                        <img src="<?= htmlspecialchars($item['gambar']) ?>" alt="<?= htmlspecialchars($item['nama']) ?>" onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
+                        <h3><?= htmlspecialchars($item['nama']) ?></h3>
+                        <div class="price">Rp <?= number_format($item['harga'], 0, ',', '.') ?></div>
+
+                        <form method="POST" action="pemesanan.php">
+                            <input type="hidden" name="id" value="<?= $item['id'] ?>">
+                            <button type="submit" name="add_to_cart" class="btn-add">+ Tambah ke Pesanan</button>
+                        </form>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+
+        <div class="cart-box">
+            <h3>Keranjang Kamu</h3>
+
+            <?php if (empty($_SESSION['cart'])): ?>
+                <p style="color: var(--muted); text-align: center; margin-top: 20px;">Wah, keranjangmu masih kosong nih.<br>Silakan pilih produk yang tersedia terlebih dahulu!</p>
+            <?php else: ?>
+
+                <?php foreach ($_SESSION['cart'] as $id => $qty): ?>
+                    <?php
+                        $namaProduk = '';
+                        $hargaProduk = 0;
+                        foreach ($produk as $p) {
+                            if ($p['id'] == $id) {
+                                $namaProduk = $p['nama'];
+                                $hargaProduk = $p['harga'];
+                                break;
+                            }
+                        }
+                    ?>
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <p><?= htmlspecialchars($namaProduk) ?></p>
+                            <span>Rp <?= number_format($hargaProduk * $qty, 0, ',', '.') ?></span>
+                        </div>
+
+                        <div class="qty-form">
+                            <form method="POST" style="display:inline;">
+                                <input type="hidden" name="id" value="<?= $id ?>">
+                                <input type="hidden" name="action" value="minus">
+                                <button type="submit" name="update_qty" class="qty-btn">-</button>
+                            </form>
+
+                            <span><?= $qty ?></span>
+
+                            <form method="POST" style="display:inline;">
+                                <input type="hidden" name="id" value="<?= $id ?>">
+                                <input type="hidden" name="action" value="plus">
+                                <button type="submit" name="update_qty" class="qty-btn">+</button>
+                            </form>
+
+                            <form method="POST" style="display:inline;">
+                                <input type="hidden" name="id" value="<?= $id ?>">
+                                <button type="submit" name="remove_item" class="btn-remove">Hapus</button>
+                            </form>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+
+                <div class="cart-total">
+                    <span>Total Harga:</span>
+                    <span>Rp <?= number_format($totalHarga, 0, ',', '.') ?></span>
+                </div>
+
+                <form method="GET" action="checkout.php">
+                    <button type="submit" class="btn-checkout">Buat Pesanan</button>
+                </form>
+
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Sweet Crumbs Bakery &#169; 2026</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="id" xml:lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pendaftaran | Sweet Crumbs Bakery</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <script type="text/javascript" src="js/script.js" defer="defer"></script>
+</head>
+<body class="register-page">
+    <div class="navbar">
+        <div class="container nav-content">
+            <a class="brand" href="index.php">Sweet Crumbs<span>.</span></a>
+            <div class="nav-links">
+                <a href="index.php" class="<?= (basename($_SERVER['PHP_SELF']) == 'index.php') ? 'active' : '' ?>">Beranda</a>
+                <a href="katalog.php" class="<?= (basename($_SERVER['PHP_SELF']) == 'katalog.php') ? 'active' : '' ?>">Katalog</a>
+                <a href="pemesanan.php" class="<?= (basename($_SERVER['PHP_SELF']) == 'pemesanan.php') ? 'active' : '' ?>">Keranjang</a>
+                <a href="pendaftaran.php" class="<?= (basename($_SERVER['PHP_SELF']) == 'pendaftaran.php') ? 'active' : '' ?>">Daftar</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container form-layout">
+        <div class="form-side-note">
+            <p class="eyebrow">JOIN OUR LITTLE BAKERY</p>
+            <h1>Satu akun untuk banyak rasa bahagia.</h1>
+            <p>Buat akun Sweet Crumbs Bakery dan jadilah bagian dari pelanggan kami.</p>
+            <div class="form-decoration">🍞 🥨 🥐</div>
+        </div>
+
+        <div class="form-card">
+            <h2>Buat Akun</h2>
+            <p class="form-subtitle">Isi data berikut untuk melakukan registrasi.</p>
+
+            <?php if ($databaseError): ?>
+                <div class="alert error">
+                    Database belum dapat diakses. Pastikan MySQL aktif dan database <strong>bakery_db</strong> sudah diimpor.
+                </div>
+            <?php endif; ?>
+
+            <?php if ($success): ?>
+                <div class="alert success">
+                    Registrasi berhasil! Akun Sweet Crumbs Bakery kamu sudah dibuat.
+                </div>
+                <p class="back-link"><a href="login.php">Lanjut ke halaman login</a></p>
+            <?php else: ?>
+
+                <?php if (!empty($errors)): ?>
+                    <div class="alert error">
+                        <p>Registrasi belum berhasil. Periksa hal berikut:</p>
+                        <ul>
+                            <?php foreach ($errors as $error): ?>
+                                <li><?php echo escape_html($error); ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
+                <form id="register-form" method="post" action="pendaftaran.php" novalidate="novalidate">
+
+                    <input
+                        type="hidden"
+                        name="csrf_token"
+                        value="<?php echo escape_html($_SESSION['csrf_token']); ?>"
+                    />
+
+                    <div class="form-group">
+                        <label for="full_name">Nama lengkap</label>
+                        <input
+                            type="text"
+                            id="full_name"
+                            name="full_name"
+                            value="<?php echo escape_html($fullName); ?>"
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            value="<?php echo escape_html($username); ?>"
+                        />
+                        <small>4–30 karakter; gunakan huruf, angka, atau garis bawah.</small>
+                        <small id="username-feedback" class="field-feedback" aria-live="polite"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input
+                            type="text"
+                            id="email"
+                            name="email"
+                            value="<?php echo escape_html($email); ?>"
+                        />
+                        <small id="email-feedback" class="field-feedback" aria-live="polite"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                        />
+                        <small>Minimal 8 karakter.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirm_password">Konfirmasi password</label>
+                        <input
+                            type="password"
+                            id="confirm_password"
+                            name="confirm_password"
+                        />
+                    </div>
+
+                    <p id="client-error" class="client-error" aria-live="polite"></p>
+
+                    <button type="submit" class="primary-button full-button">
+                        Daftar Sekarang
+                    </button>
+
+                </form>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Sweet Crumbs Bakery &#169; 2026</p>
+    </div>
+</body>
+</html>

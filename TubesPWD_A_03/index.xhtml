@@ -1,0 +1,161 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="id" xml:lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sweet Crumbs Bakery</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="container nav-content">
+
+            <a class="brand" href="index.php">
+                Sweet Crumbs<span>.</span>
+            </a>
+
+            <div class="nav-links">
+
+                <a href="index.php"
+                   class="<?= (basename($_SERVER['PHP_SELF']) == 'index.php') ? 'active' : '' ?>">
+                    Beranda
+                </a>
+
+                <a href="katalog.php"
+                   class="<?= (basename($_SERVER['PHP_SELF']) == 'katalog.php') ? 'active' : '' ?>">
+                    Katalog
+                </a>
+
+                <?php if (isset($_SESSION['user_id'])): ?>
+
+                    <a href="pemesanan.php"
+                       class="<?= (basename($_SERVER['PHP_SELF']) == 'pemesanan.php') ? 'active' : '' ?>">
+                        Keranjang
+                    </a>
+
+                    <a href="riwayat_pesanan.php"
+                       class="<?= (basename($_SERVER['PHP_SELF']) == 'riwayat_pesanan.php') ? 'active' : '' ?>">
+                        Riwayat
+                    </a>
+
+                    <a href="profil.php"
+                       class="<?= (basename($_SERVER['PHP_SELF']) == 'profil.php') ? 'active' : '' ?>">
+                        Profil
+                    </a>
+
+                    <a href="logout.php"
+                       class="nav-button"
+                       onclick="return confirm('Yakin ingin logout?')">
+                        Logout
+                    </a>
+
+                <?php else: ?>
+
+                    <a href="login.php"
+                       class="<?= (basename($_SERVER['PHP_SELF']) == 'login.php') ? 'active' : '' ?>">
+                        Login
+                    </a>
+
+                    <a class="nav-button" href="pendaftaran.php">
+                        Daftar
+                    </a>
+
+                <?php endif; ?>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Hero Section -->
+    <div class="hero">
+
+        <div class="container hero-content">
+
+            <div class="hero-copy">
+
+                <p class="eyebrow">FRESH FROM OUR OVEN</p>
+
+                <?php if (isset($_SESSION['user_id'])): ?>
+
+                    <h1>
+                        Selamat datang,
+                        <span>
+                            <?= htmlspecialchars($_SESSION['full_name']) ?>.
+                        </span>
+                    </h1>
+
+                    <p class="hero-description">
+                        Temukan roti dan pastry favoritmu,
+                        dibuat dengan bahan pilihan dan dipanggang
+                        dengan sepenuh hati.
+                    </p>
+
+                    <a class="primary-button" href="katalog.php">
+                        Lihat Katalog
+                    </a>
+
+                <?php else: ?>
+
+                    <h1>
+                        Awali hari dengan sesuatu yang
+                        <span>manis.</span>
+                    </h1>
+
+                    <p class="hero-description">
+                        Temukan roti dan pastry favoritmu,
+                        dibuat dengan bahan pilihan dan dipanggang
+                        dengan sepenuh hati.
+                    </p>
+
+                    <a class="primary-button" href="pendaftaran.php">
+                        Buat Akun
+                    </a>
+
+                <?php endif; ?>
+
+            </div>
+
+
+            <div class="hero-art" aria-label="Ilustrasi roti dan pastry">
+
+                <div class="bread-circle">
+                    <span class="bread-emoji">🥐</span>
+                    <span class="bread-caption">Baked with love</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Intro Section -->
+    <div class="container intro-section">
+
+        <p class="eyebrow">SELAMAT DATANG</p>
+
+        <h2>Freshly baked, happily served.</h2>
+
+        <p>
+            Daftar sebagai pelanggan Sweet Crumbs Bakery
+            untuk mulai menikmati pengalaman bakery kami.
+        </p>
+
+    </div>
+
+
+    <!-- Footer -->
+    <div class="footer">
+
+        <p>Sweet Crumbs Bakery &#169; 2026</p>
+
+    </div>
+
+</body>
+</html>

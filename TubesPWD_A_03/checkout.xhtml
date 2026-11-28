@@ -1,0 +1,342 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="id" xml:lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Checkout | Sweet Crumbs Bakery</title>
+
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        .checkout-container {
+            max-width: 850px;
+            margin: 50px auto;
+        }
+
+        .checkout-card {
+            background: white;
+            border: 1px solid #e8ded2;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+
+        .checkout-card h2 {
+            margin-bottom: 20px;
+        }
+
+        #map {
+            width: 100%;
+            height: 350px;
+            border-radius: 12px;
+            margin: 20px 0;
+            z-index: 1;
+        }
+
+        .location-button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #c47b45;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .location-info {
+            margin-top: 15px;
+            color: #806d5d;
+            font-size: 14px;
+        }
+
+        .checkout-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            gap: 15px;
+        }
+
+        .checkout-total {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            font-size: 19px;
+            font-weight: bold;
+            color: #c47b45;
+        }
+
+        .confirm-button {
+            width: 100%;
+            margin-top: 20px;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            background: #c47b45;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .confirm-button:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 600px) {
+            .checkout-container {
+                margin: 25px 15px;
+            }
+
+            .checkout-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="container nav-content">
+            <a class="brand" href="index.php">
+                Sweet Crumbs<span>.</span>
+            </a>
+
+            <div class="nav-links">
+                <a href="index.php">Beranda</a>
+                <a href="katalog.php">Katalog</a>
+                <a href="pemesanan.php">Keranjang</a>
+                <a href="riwayat_pesanan.php">Riwayat</a>
+                <a href="profil.php">Profil</a>
+                <a href="logout.php"
+                   class="nav-button"
+                   onclick="return confirm('Yakin ingin logout?')">
+                    Logout
+                </a>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Checkout -->
+    <div class="container checkout-container">
+
+        <div class="checkout-card">
+            <h2>Checkout Pesanan</h2>
+            <p>Periksa kembali pesanan kamu sebelum melanjutkan.</p>
+
+            <?php foreach ($itemsCheckout as $item): ?>
+                <div class="checkout-item">
+                    <span>
+                        <?= htmlspecialchars($item['nama']) ?>
+                        (<?= $item['qty'] ?>x)
+                    </span>
+
+                    <span>
+                        Rp <?= number_format($item['subtotal'], 0, ',', '.') ?>
+                    </span>
+                </div>
+            <?php endforeach; ?>
+
+            <div class="checkout-total">
+                <span>Total Harga</span>
+                <span>
+                    Rp <?= number_format($totalHarga, 0, ',', '.') ?>
+                </span>
+            </div>
+        </div>
+
+
+        <!-- Lokasi Pengiriman -->
+        <div class="checkout-card">
+            <h2>Lokasi Pengiriman</h2>
+
+            <p>
+                Lokasi toko ditandai dengan pin toko.
+                Tekan tombol berikut untuk menentukan lokasi kamu.
+            </p>
+
+            <div id="map"></div>
+
+            <button
+                type="button"
+                id="get-location"
+                class="location-button"
+            >
+                Gunakan Lokasi Saya
+            </button>
+
+            <p id="location-message" class="location-info">
+                Lokasi pelanggan belum ditentukan.
+            </p>
+
+            <p class="location-info">
+                <strong>Lokasi toko:</strong>
+                Kampus 3 UAJY, Gedung Bonaventura.
+            </p>
+        </div>
+
+
+        <!-- Konfirmasi Pesanan -->
+        <div class="checkout-card">
+            <h2>Konfirmasi Pesanan</h2>
+
+            <form method="POST" action="proses_pesanan.php" id="checkout-form">
+
+                <input
+                    type="hidden"
+                    name="latitude"
+                    id="latitude"
+                />
+
+                <input
+                    type="hidden"
+                    name="longitude"
+                    id="longitude"
+                />
+
+                <button
+                    type="submit"
+                    class="confirm-button"
+                    id="confirm-button"
+                    disabled="disabled"
+                >
+                    Konfirmasi Pesanan
+                </button>
+
+            </form>
+        </div>
+
+    </div>
+
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>Sweet Crumbs Bakery &#169; 2026</p>
+    </div>
+
+
+    <!-- JavaScript Peta -->
+    <script type="text/javascript">
+    //<![CDATA[
+
+        var tokoLat = -7.77991;
+        var tokoLng = 110.41508;
+
+        var map = L.map('map').setView([tokoLat, tokoLng], 16);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        var tokoMarker = L.marker([tokoLat, tokoLng])
+            .addTo(map)
+            .bindPopup('<b>Sweet Crumbs Bakery</b><br>Kampus 3 UAJY')
+            .openPopup();
+
+        var userMarker = null;
+
+        var locationButton = document.getElementById('get-location');
+        var locationMessage = document.getElementById('location-message');
+        var confirmButton = document.getElementById('confirm-button');
+
+        locationButton.addEventListener('click', function () {
+
+            if (!navigator.geolocation) {
+                locationMessage.textContent =
+                    'Browser kamu tidak mendukung fitur lokasi.';
+                return;
+            }
+
+            locationMessage.textContent = 'Sedang mengambil lokasi...';
+
+            navigator.geolocation.getCurrentPosition(
+                function (position) {
+
+                    var lat = position.coords.latitude;
+                    var lng = position.coords.longitude;
+
+                    document.getElementById('latitude').value = lat;
+                    document.getElementById('longitude').value = lng;
+
+                    if (userMarker) {
+                        map.removeLayer(userMarker);
+                    }
+
+                    userMarker = L.marker([lat, lng])
+                        .addTo(map)
+                        .bindPopup('<b>Lokasi Kamu</b>')
+                        .openPopup();
+
+                    var bounds = L.latLngBounds([
+                        [tokoLat, tokoLng],
+                        [lat, lng]
+                    ]);
+
+                    map.fitBounds(bounds, {
+                        padding: [40, 40]
+                    });
+
+                    locationMessage.textContent =
+                        'Lokasi berhasil ditemukan. Latitude: ' +
+                        lat.toFixed(6) +
+                        ', Longitude: ' +
+                        lng.toFixed(6);
+
+                    confirmButton.disabled = false;
+
+                },
+
+                function (error) {
+
+                    if (error.code === 1) {
+                        locationMessage.textContent =
+                            'Izin lokasi ditolak. Izinkan akses lokasi pada browser.';
+                    } else if (error.code === 2) {
+                        locationMessage.textContent =
+                            'Lokasi perangkat tidak tersedia.';
+                    } else {
+                        locationMessage.textContent =
+                            'Waktu pengambilan lokasi habis. Coba lagi.';
+                    }
+
+                },
+
+                {
+                    enableHighAccuracy: true,
+                    timeout: 15000,
+                    maximumAge: 0
+                }
+            );
+        });
+
+        document.getElementById('checkout-form')
+            .addEventListener('submit', function (event) {
+
+                if (
+                    document.getElementById('latitude').value === '' ||
+                    document.getElementById('longitude').value === ''
+                ) {
+                    event.preventDefault();
+                    alert('Silakan tentukan lokasi kamu terlebih dahulu.');
+                }
+
+            });
+
+    //]]>
+    </script>
+
+</body>
+</html>

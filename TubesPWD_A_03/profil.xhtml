@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="id" xml:lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profil Pengguna | Sweet Crumbs Bakery</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+
+    <style type="text/css">
+        /* ===== Background area foto profil ===== */
+        .profile-photo-wrap {
+            background: linear-gradient(135deg, #fff3e3 0%, #fbdcb8 100%);
+            border: 1px solid #efd3b0;
+            border-radius: 18px;
+            padding: 16px 20px;
+            box-shadow: 0 2px 8px rgba(196, 122, 69, 0.12);
+        }
+
+        /* ===== Border foto profil bertema roti ===== */
+        .avatar-wrap {
+            position: relative;
+            width: 104px;
+            height: 104px;
+            margin: 14px;
+            flex-shrink: 0;
+        }
+
+        /* Cincin gradasi warna kerak roti */
+        .avatar-wrap::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 50%;
+            background: conic-gradient(#e8b66f, #c47a45, #f3d19c, #b86a38, #e8b66f);
+            box-shadow: 0 4px 12px rgba(139, 80, 40, 0.35);
+        }
+
+        /* Garis putus-putus seperti taburan di cincin */
+        .avatar-wrap::after {
+            content: "";
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            right: 3px;
+            bottom: 3px;
+            border-radius: 50%;
+            border: 2px dashed rgba(255, 250, 243, 0.85);
+        }
+
+        /* Foto / huruf inisial di tengah cincin */
+        .avatar-wrap .profile-photo,
+        .avatar-wrap .profile-photo-placeholder {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            width: 88px;
+            height: 88px;
+            margin: 0;
+            box-sizing: border-box;
+            border-radius: 50%;
+            border: 3px solid #fffaf3;
+            z-index: 1;
+        }
+
+        .avatar-wrap .profile-photo {
+            object-fit: cover;
+            display: block;
+        }
+
+        .avatar-wrap .profile-photo-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f5e1d0;
+        }
+
+        /* Roti di sekeliling border */
+        .roti {
+            position: absolute;
+            font-size: 22px;
+            line-height: 1;
+            z-index: 2;
+            filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.25));
+            animation: floatRoti 3s ease-in-out infinite;
+        }
+        .roti-1 { top: -12px;    left: 50%; margin-left: -11px; }
+        .roti-2 { right: -12px;  top: 50%;  margin-top: -11px;  animation-delay: 0.5s; }
+        .roti-3 { bottom: -12px; left: 50%; margin-left: -11px; animation-delay: 1s; }
+        .roti-4 { left: -12px;   top: 50%;  margin-top: -11px;  animation-delay: 1.5s; }
+
+        @keyframes floatRoti {
+            0%, 100% { transform: translateY(0) rotate(-6deg); }
+            50%      { transform: translateY(-3px) rotate(6deg); }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="container nav-content">
+            <a class="brand" href="index.php">Sweet Crumbs<span>.</span></a>
+
+            <div class="nav-links">
+                <a href="index.php">Beranda</a>
+                <a href="katalog.php">Katalog</a>
+                <a href="pemesanan.php">Keranjang</a>
+                <a href="riwayat_pesanan.php">Riwayat</a>
+                <a href="profil.php" class="active">Profil</a>
+                <a href="logout.php" class="nav-button"
+                   onclick="return confirm('Yakin ingin logout?')">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container profile-container">
+
+        <div class="profile-card">
+            <h1>Profil Pengguna</h1>
+            <p>Kelola informasi akun Sweet Crumbs Bakery kamu.</p>
+
+            <?php if ($message !== ''): ?>
+                <div class="alert <?= escape_html($messageType) ?>">
+                    <?= escape_html($message) ?>
+                </div>
+            <?php endif; ?>
+
+            <!-- Foto profil -->
+            <h2 class="profile-section-title">Foto Profil</h2>
+
+            <div class="profile-photo-wrap">
+                <div class="avatar-wrap">
+                    <?php if (!empty($user['profile_photo'])): ?>
+                        <img class="profile-photo"
+                             src="uploads/profil/<?= escape_html($user['profile_photo']) ?>"
+                             alt="Foto profil" />
+                    <?php else: ?>
+                        <div class="profile-photo-placeholder">
+                            <?= escape_html(mb_strtoupper(mb_substr($user['full_name'], 0, 1, 'UTF-8'), 'UTF-8')) ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <span class="roti roti-1">&#129360;</span>
+                    <span class="roti roti-2">&#127838;</span>
+                    <span class="roti roti-3">&#129366;</span>
+                    <span class="roti roti-4">&#129473;</span>
+                </div>
+
+                <div class="profile-photo-actions">
+                    <form method="post" action="profil.php" enctype="multipart/form-data">
+                        <input type="hidden" name="action" value="upload_photo" />
+                        <input type="hidden" name="csrf_token"
+                               value="<?= escape_html($_SESSION['csrf_token']) ?>" />
+
+                        <input type="file" name="photo"
+                               accept="image/jpeg,image/png,image/webp" />
+                        <small class="profile-hint">JPG, PNG, atau WEBP. Maksimal 2 MB.</small>
+
+                        <button type="submit" class="primary-button">
+                            Upload Foto
+                        </button>
+                    </form>
+
+                    <?php if (!empty($user['profile_photo'])): ?>
+                        <form method="post" action="profil.php"
+                              onsubmit="return confirm('Hapus foto profil?')">
+                            <input type="hidden" name="action" value="delete_photo" />
+                            <input type="hidden" name="csrf_token"
+                                   value="<?= escape_html($_SESSION['csrf_token']) ?>" />
+                            <button type="submit" class="danger-button">
+                                Hapus Foto
+                            </button>
+                        </form>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <hr class="profile-divider" />
+
+            <!-- Informasi akun -->
+            <h2 class="profile-section-title">Informasi Akun</h2>
+
+            <form method="post" action="profil.php">
+                <input type="hidden" name="action" value="update_profile" />
+                <input type="hidden" name="csrf_token"
+                       value="<?= escape_html($_SESSION['csrf_token']) ?>" />
+
+                <label for="full_name">Nama Lengkap</label>
+                <input type="text" id="full_name" name="full_name"
+                       value="<?= escape_html($user['full_name']) ?>"
+                       maxlength="100" required="required" />
+
+                <label for="username">Username</label>
+                <input type="text" id="username"
+                       value="<?= escape_html($user['username']) ?>"
+                       readonly="readonly" />
+
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email"
+                       value="<?= escape_html($user['email']) ?>"
+                       maxlength="100" required="required" />
+
+                <label for="phone">Nomor Telepon</label>
+                <input type="text" id="phone" name="phone"
+                       value="<?= escape_html($user['phone'] ?? '') ?>"
+                       maxlength="20" />
+
+                <label for="address">Alamat</label>
+                <textarea id="address" name="address" rows="4"><?= escape_html($user['address'] ?? '') ?></textarea>
+
+                <button type="submit" class="primary-button">
+                    Simpan Perubahan
+                </button>
+            </form>
+        </div>
+
+        <!-- ========== KARTU 2: UBAH PASSWORD ========== -->
+        <div class="profile-card profile-card-spaced">
+            <h2 class="profile-section-title">Ubah Password</h2>
+            <p>Gunakan password minimal 8 karakter.</p>
+
+            <form method="post" action="profil.php">
+                <input type="hidden" name="action" value="change_password" />
+                <input type="hidden" name="csrf_token"
+                       value="<?= escape_html($_SESSION['csrf_token']) ?>" />
+
+                <label for="current_password">Password Saat Ini</label>
+                <input type="password" id="current_password" name="current_password"
+                       autocomplete="current-password" required="required" />
+
+                <label for="new_password">Password Baru</label>
+                <input type="password" id="new_password" name="new_password"
+                       minlength="8" autocomplete="new-password" required="required" />
+
+                <label for="confirm_password">Konfirmasi Password Baru</label>
+                <input type="password" id="confirm_password" name="confirm_password"
+                       minlength="8" autocomplete="new-password" required="required" />
+
+                <button type="submit" class="primary-button">
+                    Ubah Password
+                </button>
+            </form>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <p>Sweet Crumbs Bakery &#169; 2026</p>
+    </div>
+
+</body>
+</html>
